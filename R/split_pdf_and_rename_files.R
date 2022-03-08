@@ -20,9 +20,9 @@ case_numbers = str_extract(pdf_page_text, '(?<=Case #:\\s)\\d+|(?<=de caso:\\s)\
 
 #alternatively, if you want to keep the "case #: " or the "de caso" so you know if its the spanish file, 
 #we can do (also just going to do a bit of cleaning for them): 
-case_nums_alt = str_extract(pdf_page_text, 'Case #:\\s\\d+|de caso:\\s\\d+') %>% 
-  str_replace_all(., "\\s#:\\s|(?<=caso):\\s", "_num_") %>% 
-  str_replace_all(., "\\s", "_") %>% 
+case_nums_alt = str_extract(pdf_page_text, 'Case #:\\s\\d+|de caso:\\s\\d+') %>% #extracts the case num and language
+  str_replace_all(., "\\s#:\\s|(?<=caso):\\s", "_num_") %>% #replaces the hash and colon with "_num_" and replaces the colon-space after "caso" with _num_
+  str_replace_all(., "\\s", "_") %>% #gets rid of all spaces
   str_to_lower(.) %>% 
   str_c('files/split_files/', ., '.pdf')
 
@@ -36,7 +36,7 @@ renamed_files = map2(.x = split_files,
                      ~ file.rename(from = .x, 
                                    to = .y))
 
-#cleanup
+#cleanup/delete all teh files in this path so their not on my computer
 
 map(.x = list.files(path = 'files/split_files', pattern = ".pdf", full.names = TRUE), 
     ~ file.remove(.x))
