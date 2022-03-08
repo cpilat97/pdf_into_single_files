@@ -34,6 +34,7 @@ renamed_files = map2(.x = split_files,
                      ~ file.rename(from = .x, 
                                    to = .y))
 
+#combine individual letters back into whole letters by case num
 case_nums = tibble(files = list.files('files/split_files', pattern = "*.pdf", full.names = TRUE)) %>% 
   mutate(case_numbers = str_extract(files, pattern = "(?<=num_)\\d+")) %>% 
   group_by(case_nums, case_numbers) %>% 
