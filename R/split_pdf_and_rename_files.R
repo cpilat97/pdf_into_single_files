@@ -11,8 +11,6 @@ pdf_subset(input = 'files/tmp_fee_FEE _Notice_2021_1001_to_2000.pdf', pages = 1:
 #should be the same length as the file numbers you're reading in. 
 pdf_page_text = pdf_text(pdf = 'files/fees_100.pdf')
 
-length(pdf_metadata)  #quick check
-
 #get case numbers from the pdf text for later renaming: 
 #The regex in the str extract is looking for numbers immediately proceeding text that says
 #"Case #: " or "de caso: " 
@@ -36,9 +34,22 @@ renamed_files = map2(.x = split_files,
                      ~ file.rename(from = .x, 
                                    to = .y))
 
+case_nums = tibble(files = list.files('files/split_files', pattern = "*.pdf", full.names = TRUE)) %>% 
+  mutate(case_numbers = str_extract(files, pattern = "(?<=num_)\\d+")) %>% 
+  group_by(case_nums, case_numbers) %>% 
+  mutate(files_to_combine = list(files)) %>% 
+  filter(str_detect(files, "de_caso_num", negate = TRUE))
+
+combine_pdfs = map2(.x = test$files_to_combine,
+                    .y = paste0('files/split_files/combine/case_letter_',test$case_numbers, '.pdf'), 
+                    ~ pdftools::pdf_combine(input = .x, output = .y))
+
 #cleanup/delete all teh files in this path so their not on my computer
 
-map(.x = list.files(path = 'files/split_files', pattern = ".pdf", full.names = TRUE), 
+map(.x = list.files(path = 'files/split_files', pattern = ".pdf", full.names = TRUE),
+    ~ file.remove(.x))
+
+map(.x = list.files(path = 'files/split_files/combine', pattern = ".pdf", full.names = TRUE),
     ~ file.remove(.x))
 
 
