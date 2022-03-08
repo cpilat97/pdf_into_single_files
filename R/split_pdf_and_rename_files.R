@@ -36,4 +36,11 @@ renamed_files = map2(.x = split_files,
                      ~ file.rename(from = .x, 
                                    to = .y))
 
+#cleanup
+
+map(.x = list.files(path = 'files/split_files', pattern = ".pdf", full.names = TRUE), 
+    ~ file.remove(.x))
+
+
+
 
